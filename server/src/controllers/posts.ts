@@ -4,7 +4,7 @@ import { getUserBySessionToken } from '../db/users';
 
 export const getAllPosts = async (req: express.Request, res: express.Response): Promise<any> => {
     try{
-        const posts = await getPosts();
+        const posts = await getPosts().sort({createdAt:-1});
 
         return res.status(200).json(posts);
     }

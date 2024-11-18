@@ -77,9 +77,9 @@ const RegisterForm: React.FC = () => {
             Register
           </Typography>
           
-          {error && <Typography color="error" align="left" mb={2}>{error}</Typography>}
+          {error && <Typography  sx={{ overflow: 'hidden'}} color="error" align="left" mb={2}>{error}</Typography>}
       
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', overflow:'hidden' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px'}}>
             <TextField
               label="Email"
               variant="outlined"

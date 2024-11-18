@@ -54,6 +54,8 @@ const LoginForm: React.FC = () => {
     }
   };
 
+  const theme = useTheme();
+
   return (
   <div>
     <Navbar/>
@@ -65,11 +67,11 @@ const LoginForm: React.FC = () => {
             borderRadius: 4,
           }}
         >
-        <Typography variant="h4" align="center" mb={2}>Login</Typography>
+        <Typography  sx={{ overflow: 'hidden'}} variant="h4" align="center" mb={2}>Login</Typography>
 
-        {error && <Typography color="error" align='left' mb={2}>{error}</Typography>}
+        {error && <Typography sx={{ overflow: 'hidden'}} color="error" align='left' mb={2}>{error}</Typography>}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px'}}>
           <TextField
             label="Email"
             variant="outlined"
@@ -101,7 +103,7 @@ const LoginForm: React.FC = () => {
           >
             Login
           </Button>
-          <Box sx={{ marginTop: 2 }}>
+          <Box sx={{}}>
             <Link component={RouterLink} to="/register" variant="body2">
             Don't have an account? Register.
             </Link>
