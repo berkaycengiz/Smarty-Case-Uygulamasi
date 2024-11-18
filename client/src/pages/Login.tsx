@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { TextField, Button, Typography, Container, useTheme, Box, Link } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
 import { Link as RouterLink } from 'react-router-dom';
+import axios from 'axios';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+
 
 interface FormData {
   email: string;
@@ -10,19 +14,29 @@ interface FormData {
 
 const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({ email: '', password: '' });
-  const [error, setError] = useState<string>('');
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (formData.email === '' || formData.password === '') {
-      setError('Lütfen tüm alanları doldurun.');
+      setError('Please make sure all fields are filled in correctly.');
     }
     else if (formData.password.length < 6) {
-        setError('Şifre en az 6 karakter olmalıdır.');
-        return;
+      setError('Password must be at least 6 characters long.');
+      return;
     }
     else {
       setError('');
+    }
+    try {
+      const response = await axios.post('http://localhost:8080/auth/login', formData);
+      console.log('Response:', response.data);
+      setSuccess(true);
+    } catch (err: any) {
+      console.error('Error:', err.response || err.message);
+      setError(err.response?.data?.message || 'Invalid email or password.');
     }
   };
 
@@ -40,61 +54,63 @@ const LoginForm: React.FC = () => {
     }
   };
 
-  const theme = useTheme();
-
   return (
-    <Container maxWidth="xs" style={{ marginTop: '120px' }}>
-      <Box
-      sx={{
-          padding: 3,
-          border: '1px solid #ccc',
-          borderRadius: 4,
-        }}
-      >
-      <Typography variant="h4" align="center" mb={2}>Login</Typography>
-
-      {error && <Typography color="error" align='left' mb={2}>{error}</Typography>}
-
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <TextField
-          label="Email"
-          variant="outlined"
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          fullWidth
-          required
-        />
-        
-        <TextField
-          label="Password"
-          variant="outlined"
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          fullWidth
-          required
-        />
-
-        <Button 
-          sx={{ display: 'flex', width: '47%' }}
-          variant="contained" 
-          color="primary" 
-          type="submit"
-          startIcon={<LoginIcon />}
+  <div>
+    <Navbar/>
+      <Container maxWidth="xs" style={{ marginTop: '120px', overflow: 'hidden' }}>
+        <Box
+          sx={{
+            padding: 3,
+            border: '1px solid #ccc',
+            borderRadius: 4,
+          }}
         >
-          Login
-        </Button>
-        <Box sx={{ marginTop: 2 }}>
-          <Link component={RouterLink} to="/register" variant="body2">
-          Don't have an account? Register.
-          </Link>
+        <Typography variant="h4" align="center" mb={2}>Login</Typography>
+
+        {error && <Typography color="error" align='left' mb={2}>{error}</Typography>}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', overflow: 'hidden' }}>
+          <TextField
+            label="Email"
+            variant="outlined"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            fullWidth
+            required
+          />
+          
+          <TextField
+            label="Password"
+            variant="outlined"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            fullWidth
+            required
+          />
+
+          <Button 
+            sx={{ display: 'flex', width: '47%', overflow: 'hidden'}}
+            variant="contained" 
+            color="primary" 
+            type="submit"
+            startIcon={<LoginIcon />}
+          >
+            Login
+          </Button>
+          <Box sx={{ marginTop: 2 }}>
+            <Link component={RouterLink} to="/register" variant="body2">
+            Don't have an account? Register.
+            </Link>
+          </Box>
+        </form>
         </Box>
-      </form>
-      </Box>
-    </Container>
+      </Container>
+    <Footer/>
+  </div>  
   );
 };
 

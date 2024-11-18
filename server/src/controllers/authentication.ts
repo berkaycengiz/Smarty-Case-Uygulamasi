@@ -47,7 +47,7 @@ export const register = async (req: express.Request, res: express.Response): Pro
         const existingUser = await getUserByEmail(email);
 
         if(existingUser){
-            return res.sendStatus(400);
+            return res.status(400).json({ message: 'Email already in use' });
         }
 
         const salt = random();
