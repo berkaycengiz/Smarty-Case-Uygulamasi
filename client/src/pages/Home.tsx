@@ -32,7 +32,7 @@ return (
   <div>
     <Navbar/>
       <Container maxWidth="lg" sx={{ marginTop: 4, overflow:'hidden' }}>
-        <Typography variant="h3" fontSize={40} gutterBottom align="center" fontWeight={600}>
+        <Typography variant="h3" marginTop={4} marginBottom={4} fontSize={40} align="center" fontWeight={600}>
           Welcome to Our Blog
         </Typography>
         <Typography variant="h4" fontSize={32} gutterBottom fontWeight={500}>

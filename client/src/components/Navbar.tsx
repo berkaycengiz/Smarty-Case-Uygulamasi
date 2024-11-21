@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, useMediaQuery } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -7,6 +7,7 @@ import axios from 'axios';
 const Navbar: React.FC = () => {
 
   const [menuOpen, setMenuOpen] = useState(false);
+
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -17,12 +18,17 @@ const Navbar: React.FC = () => {
       const response = await axios.post('http://localhost:8080/auth/logout', {}, {
         withCredentials: true,
       });
-      console.log('Logout successful:', response.data);
+      console.log(response.data);
     } 
     catch (err: any) {
-      console.error('Logout failed:', err.response?.data || err.message);
+      console.error(err.response?.data || err.message);
     }
   };
+
+  const isLoggedIn = () => {
+    return document.cookie.split(';').some((item) => item.trim().startsWith('COOKIE-AUTH='));
+  };
+
 
   return (
     <Box sx={{marginBottom:'96px', overflow: 'hidden'}}> 
@@ -32,25 +38,30 @@ const Navbar: React.FC = () => {
           <Typography sx={{ flexGrow: 1 }}>
           </Typography>
             <Box sx={{display:{sm:'flex', xs:'none'}}}>
-              <Button color="inherit" component={RouterLink} to="/login" sx={{"&:hover":{scale:1.07}, transition:'scale 0.15s linear'}}>Login</Button>
-              <Button color="inherit" component={RouterLink} to="/register" sx={{"&:hover":{scale:1.07}, transition:'scale 0.15s linear'}}>Register</Button>
+              <Button color="inherit" component={RouterLink} to="/register" sx={{"&:hover":{scale:1.07}, transition:'scale 0.15s linear'}}>Register
+              </ Button>
+              <Button color="inherit" component={RouterLink} to="/login" sx={{"&:hover":{scale:1.07}, transition:'scale 0.15s linear'}}>Login
+              </Button>
             </Box>
             <Box sx={{display:{sm:'none', xs:'block'}}}>
-              <Button color="inherit" variant="text" sx={{minWidth:'', width:'48px', height:'48px', padding:'0', "&:hover":{scale:1.07}, transition:'scale 0.15s linear'}} onClick={toggleMenu} >
+              <Button color="inherit" variant="text" sx={{minWidth:'', width:'48px', height:'48px', padding:'0', "&:hover":{scale:1.07}, transition:'scale 0.15s linear'}} onClick={toggleMenu}>
               <AccountCircleIcon sx={{fontSize:'32px'}}/>
               
               </Button>
             </Box>
         </Toolbar>
       </AppBar>
-      <Box sx={{flexDirection:'column', alignItems:'center', zIndex:'5', marginTop:'64px', right:'0', position:'fixed', display:{sm:'none', xs:'flex'}, backgroundColor: 'rgba(0, 0, 0, 0.2)', height:'180px', width:'140px', transform: menuOpen ? 'scaleY(1) translateX(0)' : 'scaleY(0) translateX(140px)', transition: 'transform 0.5s ease-in-out', backdropFilter:'blur(4px)', borderRadius:'12px'}}>
-        <Button component={RouterLink} to="/login" variant="text" sx={{marginTop:'20px', color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0'}}>
-          Login
-        </Button>
-        <Button component={RouterLink} to="/register" variant="text" sx={{ color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0' }}>
+      <Box sx={{flexDirection:'column', alignItems:'center', zIndex:'5', marginTop:'64px', right:'0', position:'fixed', display:{sm:'none', xs:'flex'}, backgroundColor: 'rgba(0, 0, 0, 0.05)', height:'180px', width:'140px', transform: menuOpen ? 'scaleY(1) translateX(0)' : 'scaleY(0) translateX(140px)', transition: 'transform 0.5s ease-in-out', backdropFilter:'blur(16px)', borderRadius:'12px'}}>
+        <Button component={RouterLink} to="/register" variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px',  borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0', marginTop:'20px'}}>
           Register
         </Button>
-        <Button onClick={handleLogout} component={RouterLink} to="/" variant="text" sx={{ color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0' }}>
+        <Button component={RouterLink} to="/login" variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0', display: isLoggedIn() ? 'none' : 'inline-flex'}}>
+          Login
+        </Button>
+        <Button variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0',  display: isLoggedIn() ? 'inline-flex' : 'none'}}>
+          PROFILE
+        </Button>
+        <Button onClick={handleLogout} component={RouterLink} to="/" variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0', display: isLoggedIn() ? 'inline-flex' : 'none' }}>
           Logout
         </Button>
       </Box>
