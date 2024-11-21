@@ -31,7 +31,9 @@ const LoginForm: React.FC = () => {
       setError('');
     }
     try {
-      const response = await axios.post('http://localhost:8080/auth/login', formData);
+      const response = await axios.post('http://localhost:8080/auth/login', formData, {
+        withCredentials: true,
+      });
       console.log('Response:', response.data);
       setSuccess(true);
     } catch (err: any) {

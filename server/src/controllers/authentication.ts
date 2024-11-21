@@ -1,5 +1,5 @@
 import express from "express";
-import { getUserByEmail, createUser } from "../db/users";
+import { getUserByEmail, createUser, getUserBySessionToken } from "../db/users";
 import { authentication, random } from "../helpers";
 
 export const login = async (req: express.Request, res: express.Response): Promise<any> => {
@@ -26,7 +26,7 @@ export const login = async (req: express.Request, res: express.Response): Promis
 
         await user.save();
 
-        res.cookie('COOKIE-AUTH', user.authentication.sessionToken, {domain: 'localhost', path: '/'});
+        res.cookie('COOKIE-AUTH', user.authentication.sessionToken, { domain: '.localhost', path: '/' });
 
         return res.status(200).json(user).end();
     }
@@ -63,6 +63,27 @@ export const register = async (req: express.Request, res: express.Response): Pro
         return res.status(200).json(user).end;
     }
     catch (error){
+        console.log(error);
+        return res.sendStatus(400);
+    }
+};
+
+export const logout  = async (req: express.Request, res: express.Response): Promise<any> => {
+    try{
+        const sessionToken = req.cookies['COOKIE-AUTH'];
+        
+        if (!sessionToken) {
+            return res.status(401).json({ message: 'Unauthorized: No session token provided' });
+        }
+        
+        const user = await getUserBySessionToken(sessionToken);
+
+        user.authentication.sessionToken = '';
+        await user.save();
+        res.clearCookie('COOKIE-AUTH');
+        return res.status(200).json({ message: 'Successfully logged out' });
+    }
+    catch(error){
         console.log(error);
         return res.sendStatus(400);
     }
