@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 const server = http.createServer(app);
 const port = process.env.PORT;
 
-app.listen(8080, '0.0.0.0', () => {
+server.listen(port, () => {
     console.log('Server is running on http://localhost:' + port + '/');
 });
 

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { TextField, Button, Typography, Container, useTheme, Box, Link } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { TextField, Button, Typography, Container, useTheme, Box, Link, Snackbar, Alert} from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -17,8 +17,36 @@ const LoginForm: React.FC = () => {
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
   const navigate = useNavigate();
 
+  const location = useLocation();
+  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+  const [severity, setSeverity] = React.useState<'success' | 'error' | 'info' | 'warning'>('success');
+
+  useEffect(() => {
+    if (location.state && location.state.message) {
+      setMessage(location.state.message);
+      setSeverity(location.state.severity || 'success');
+      setOpen(true);
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate]);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const isLoggedIn = () => {
+    return document.cookie.split(';').some((item) => item.trim().startsWith('COOKIE-AUTH='));
+  };
+
+  useEffect(() => {
+    if (isLoggedIn()) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -38,18 +66,15 @@ const LoginForm: React.FC = () => {
       });
       console.log('Response:', response.data);
       setSuccess(true);
-      navigate('/');
+      localStorage.setItem('username', response.data.username);
+      navigate('/', {
+        state: {message: 'Login successful!', severity: 'success' },
+      });
     } catch (err: any) {
       console.error('Error:', err.response || err.message);
       setError(err.response?.data?.message || 'Invalid email or password.');
     }
   };
-
-  // const route = () => {
-  //   return success == true && document.cookie.split(';').some((item) => item.trim().startsWith('COOKIE-AUTH='));
-  // };
-
-
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -104,7 +129,6 @@ const LoginForm: React.FC = () => {
             fullWidth
             required
           />
-
           <Button 
             sx={{ display: 'flex', width: '47%', overflow: 'hidden'}}
             variant="contained" 
@@ -121,6 +145,11 @@ const LoginForm: React.FC = () => {
           </Box>
         </form>
         </Box>
+        <Snackbar open={open} autoHideDuration={2500} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+          <Alert onClose={handleClose} severity={severity} variant="outlined">
+            {message}
+          </Alert>
+        </Snackbar>
       </Container>
     <Footer/>
   </div>  

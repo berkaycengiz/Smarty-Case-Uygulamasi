@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Button, Card, CardContent, CardActions, useTheme} from '@mui/material';
+import { Container, Typography, Box, Button, Card, CardContent, CardActions, useTheme, Snackbar, Alert } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface BlogPost {
@@ -15,6 +15,27 @@ interface BlogPost {
 
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  
+  const navigate = useNavigate();
+
+  const location = useLocation();
+  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+  const [severity, setSeverity] = React.useState<'success' | 'error' | 'info' | 'warning'>('success');
+
+
+  useEffect(() => {
+    if (location.state && location.state.message) {
+      setMessage(location.state.message);
+      setSeverity(location.state.severity || 'success');
+      setOpen(true);
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate]);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     axios.get('http://localhost:8080/posts')
@@ -61,6 +82,11 @@ return (
             </Grid>
           ))}
         </Grid>
+        <Snackbar open={open} autoHideDuration={2500} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+          <Alert onClose={handleClose} severity={severity} variant="outlined">
+            {message}
+          </Alert>
+        </Snackbar>
       </Container>
     <Footer />
   </div>

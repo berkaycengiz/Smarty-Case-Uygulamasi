@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, TextField, Box, Link, Container, Typography } from '@mui/material';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -17,6 +17,25 @@ const RegisterForm: React.FC = () => {
   const [success, setSuccess] = useState(false);
 
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+  const [severity, setSeverity] = React.useState<'success' | 'error' | 'info' | 'warning'>('success');
+
+
+  useEffect(() => {
+    if (location.state && location.state.message) {
+      setMessage(location.state.message);
+      setSeverity(location.state.severity || 'success');
+      setOpen(true);
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate]);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -58,7 +77,9 @@ const RegisterForm: React.FC = () => {
       });
       console.log('Response:', response.data);
       setSuccess(true);
-      navigate('/');
+      navigate('/login', {
+        state: { message: 'Registered successfully!', severity: 'success' },
+      });
     } catch (err: any) {
       console.error('Error:', err.response || err.message);
       setError(err.response?.data?.message || 'An error occurred while registering');

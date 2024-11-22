@@ -44,7 +44,7 @@ const PostDetails: React.FC = () => {
           {post.title}
         </Typography>
         <Card sx={{maxWidth:'800px', display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:'180px', border:"2px solid rgba(155, 155, 155, 0.16)", backgroundColor:'rgba(155, 155, 155, 0.1)', borderRadius:'0'}}>
-          <CardContent>
+          <CardContent sx={{padding:'24px'}}>
             <Typography variant="body1" color="textPrimary" overflow="hidden" sx={{textOverflow: 'ellipsis', whiteSpace:'normal'}}>
               {post.content}
             </Typography>
@@ -52,11 +52,11 @@ const PostDetails: React.FC = () => {
               Author: {post.author}
             </Typography>
           </CardContent>
-          <CardActions sx={{ display:'flex', justifyContent:'space-between', padding:'16px'}}>
+          <CardActions sx={{ display:'flex', justifyContent:'space-between', padding:'24px'}}>
             <Typography variant="body2" color="textSecondary" sx={{ textAlign: 'left', marginTop: '8px' }}>
               Published on: {new Date(post.createdAt).toLocaleTimeString()} <br/> {new Date(post.createdAt).toLocaleDateString()} 
             </Typography>
-            <Button size="small" variant="contained" sx={{"&:hover":{scale:1.05}, transition:'scale 0.15s linear', whiteSpace:'nowrap'}} component={Link} to={`/`}>
+            <Button size="small" variant="contained" sx={{width:'100%', maxWidth:'120px', fontSize:'14px', "&:hover":{scale:1.05}, transition:'scale 0.15s linear', whiteSpace:'nowrap'}} component={Link} to={`/`}>
               Back to Home
             </Button>
           </CardActions>
