@@ -19,6 +19,7 @@ const Navbar: React.FC = () => {
         withCredentials: true,
       });
       console.log(response.data);
+      setMenuOpen(!menuOpen);
     } 
     catch (err: any) {
       console.error(err.response?.data || err.message);
@@ -52,13 +53,13 @@ const Navbar: React.FC = () => {
         </Toolbar>
       </AppBar>
       <Box sx={{flexDirection:'column', alignItems:'center', zIndex:'5', marginTop:'64px', right:'0', position:'fixed', display:{sm:'none', xs:'flex'}, backgroundColor: 'rgba(0, 0, 0, 0.05)', height:'180px', width:'140px', transform: menuOpen ? 'scaleY(1) translateX(0)' : 'scaleY(0) translateX(140px)', transition: 'transform 0.5s ease-in-out', backdropFilter:'blur(16px)', borderRadius:'12px'}}>
-        <Button component={RouterLink} to="/register" variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px',  borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0', marginTop:'20px'}}>
+        <Button onClick={toggleMenu} component={RouterLink} to="/register" variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0', marginTop:'20px'}}>
           Register
         </Button>
-        <Button component={RouterLink} to="/login" variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0', display: isLoggedIn() ? 'none' : 'inline-flex'}}>
+        <Button onClick={toggleMenu} component={RouterLink} to="/login" variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0', display: isLoggedIn() ? 'none' : 'inline-flex'}}>
           Login
         </Button>
-        <Button variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0',  display: isLoggedIn() ? 'inline-flex' : 'none'}}>
+        <Button onClick={toggleMenu} variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0',  display: isLoggedIn() ? 'inline-flex' : 'none'}}>
           PROFILE
         </Button>
         <Button onClick={handleLogout} component={RouterLink} to="/" variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0', display: isLoggedIn() ? 'inline-flex' : 'none' }}>

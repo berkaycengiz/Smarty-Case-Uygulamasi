@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Container, useTheme, Box, Link } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -17,6 +17,8 @@ const LoginForm: React.FC = () => {
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -36,11 +38,18 @@ const LoginForm: React.FC = () => {
       });
       console.log('Response:', response.data);
       setSuccess(true);
+      navigate('/');
     } catch (err: any) {
       console.error('Error:', err.response || err.message);
       setError(err.response?.data?.message || 'Invalid email or password.');
     }
   };
+
+  // const route = () => {
+  //   return success == true && document.cookie.split(';').some((item) => item.trim().startsWith('COOKIE-AUTH='));
+  // };
+
+
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -66,7 +75,7 @@ const LoginForm: React.FC = () => {
           sx={{
             padding: 3,
             border: '1px solid #ccc',
-            borderRadius: 4,
+            borderRadius: 4
           }}
         >
         <Typography  sx={{ overflow: 'hidden'}} variant="h4" align="center" mb={2}>Login</Typography>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, TextField, Box, Link, Container, Typography } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -15,6 +15,8 @@ const RegisterForm: React.FC = () => {
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -56,6 +58,7 @@ const RegisterForm: React.FC = () => {
       });
       console.log('Response:', response.data);
       setSuccess(true);
+      navigate('/');
     } catch (err: any) {
       console.error('Error:', err.response || err.message);
       setError(err.response?.data?.message || 'An error occurred while registering');
