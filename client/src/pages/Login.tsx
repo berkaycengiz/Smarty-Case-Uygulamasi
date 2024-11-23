@@ -34,10 +34,6 @@ const LoginForm: React.FC = () => {
     }
   }, [location.state, navigate]);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   const isLoggedIn = () => {
     return document.cookie.split(';').some((item) => item.trim().startsWith('COOKIE-AUTH='));
   };
@@ -68,7 +64,7 @@ const LoginForm: React.FC = () => {
       setSuccess(true);
       localStorage.setItem('username', response.data.username);
       navigate('/', {
-        state: {message: 'Login successful!', severity: 'success' },
+        state: {message: 'Login successful!', severity: 'success'},
       });
     } catch (err: any) {
       console.error('Error:', err.response || err.message);
@@ -145,11 +141,6 @@ const LoginForm: React.FC = () => {
           </Box>
         </form>
         </Box>
-        <Snackbar open={open} autoHideDuration={2500} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
-          <Alert onClose={handleClose} severity={severity} variant="outlined">
-            {message}
-          </Alert>
-        </Snackbar>
       </Container>
     <Footer/>
   </div>  

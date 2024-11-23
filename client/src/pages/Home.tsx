@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Button, Card, CardContent, CardActions, useTheme, Snackbar, Alert } from '@mui/material';
+import { Container, Typography, Box, Button, Card, CardContent, CardActions, useTheme, Snackbar, Alert, Paper, TextField } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -13,9 +13,19 @@ interface BlogPost {
   author: string;
 }
 
+interface FormData {
+  title: string;
+  content: string;
+}
+
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   
+  const [formData, setFormData] = useState<FormData>({ title: '', content: '' });
+
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -23,6 +33,9 @@ const Home: React.FC = () => {
   const [message, setMessage] = React.useState('');
   const [severity, setSeverity] = React.useState<'success' | 'error' | 'info' | 'warning'>('success');
 
+  const isLoggedIn = () => {
+    return document.cookie.split(';').some((item) => item.trim().startsWith('COOKIE-AUTH='));
+  };
 
   useEffect(() => {
     if (location.state && location.state.message) {
@@ -45,17 +58,87 @@ const Home: React.FC = () => {
       .catch((error) => {
         console.error('Error fetching posts:', error);
       });
-}, []);
+  }, []);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    if (formData.title === '' || formData.content === '') {
+      setError('Please make sure all fields are filled in correctly.');
+    }
+    else {
+      setError('');
+    }
+    try {
+      const response = await axios.post('http://localhost:8080/posts', formData, {
+        withCredentials: true,
+      });
+      console.log('Response:', response.data);
+      setSuccess(true);
+      navigate('/', {
+        state: {message: 'Published successfully!', severity: 'success'},
+      });
+    } 
+    catch (err: any) {
+      console.error('Error:', err.response || err.message);
+      setError(err.response?.data?.message);
+    }
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
+    if ((name === 'title' && value.length == 0) || (name === 'content'  && value.length == 0)){
+        setError('Please make sure all fields are filled in correctly.');
+    }
+    else {
+        setError('');
+    }
+  };
+
 
   const theme = useTheme();
 
 return (
   <div>
     <Navbar/>
-      <Container maxWidth="lg" sx={{ marginTop: 4, overflow:'hidden' }}>
+      <Container maxWidth="lg" sx={{ marginTop: 4, overflow:'hidden', padding:'0 24px'}}>
         <Typography variant="h3" marginTop={4} marginBottom={4} fontSize={40} align="center" fontWeight={600}>
           Welcome to Our Blog
         </Typography>
+        <Typography variant="h4" fontSize={32} gutterBottom fontWeight={500} sx={{display: isLoggedIn() ? 'flex' : 'none'}}>
+          Create a New Post
+        </Typography>
+          <Box sx={{display: isLoggedIn() ? 'flex' : 'none', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+            <form onSubmit={handleSubmit} style={{width:'80%'}}>
+            {error && <Typography sx={{ overflow: 'hidden'}} color="error" align='left' mt={1} mb={2}>{error}</Typography>}
+              <TextField
+                fullWidth
+                label="Title"
+                variant="outlined"
+                margin="normal"
+                required
+                onChange={handleChange}
+                name="title"
+                value={formData.title}
+              />
+              <TextField
+                fullWidth
+                label="Content"
+                variant="outlined"
+                multiline
+                rows={8}
+                margin="normal"
+                required
+                onChange={handleChange}
+                name="content"
+                value={formData.content}
+              />
+              <Box sx={{ textAlign: 'center', mt: 2, mb: 2 }}>
+                <Button variant="contained" color="primary" type="submit" sx={{ textTransform: 'none', padding: '10px 40px', "&:hover":{scale:1.05}, transition:'scale 0.15s linear'}}>
+                  Publish
+                </Button>
+              </Box>
+            </form>
+          </Box>
         <Typography variant="h4" fontSize={32} gutterBottom fontWeight={500}>
           Latest
         </Typography>
