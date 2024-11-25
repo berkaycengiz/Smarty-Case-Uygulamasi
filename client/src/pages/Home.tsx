@@ -4,6 +4,8 @@ import Grid from '@mui/material/Grid2';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 
 interface BlogPost {
@@ -26,12 +28,19 @@ const Home: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  const username = localStorage.getItem('username');
+
+  const theme = useTheme();
+
   const navigate = useNavigate();
 
   const location = useLocation();
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [severity, setSeverity] = React.useState<'success' | 'error' | 'info' | 'warning'>('success');
+
+  const [editMode, setEditMode] = useState(false); // Düzenleme modunun açık/kapalı olduğunu tutar
+  const [editPostId, setEditPostId] = useState<string | null>(null); // Düzenlenen postun ID'sini tutar
 
   const isLoggedIn = () => {
     return document.cookie.split(';').some((item) => item.trim().startsWith('COOKIE-AUTH='));
@@ -97,9 +106,6 @@ const Home: React.FC = () => {
     }
   };
 
-
-  const theme = useTheme();
-
 return (
   <div>
     <Navbar/>
@@ -151,8 +157,30 @@ return (
             <Grid size={{ xs: 12, md: 4, sm: 6 }} key={post._id}>
               <Card sx={{display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:'180px', border:"2px solid rgba(155, 155, 155, 0.16)", backgroundColor:'rgba(155, 155, 155, 0.1)', borderRadius:'0'}}>
                 <CardContent sx={{padding:'12px'}}>
+                  <Box sx={{display:'flex', justifyContent:'space-between'}}>
                   <Typography component={Link} to={`/posts/${post._id}`} variant="h6" overflow='hidden' sx={{ color:'inherit', "&:hover":{color: '#FF5733'}, textDecoration:'none', whiteSpace: 'nowrap', textOverflow: 'ellipsis', transition:'color 0.15s linear'}}>{post.title}</Typography>
-                  <Typography variant="body2" color="textSecondary" overflow='hidden' sx={{textOverflow: 'ellipsis', whiteSpace:'normal'}}>
+                  {post.author === username && (
+                    <Box sx={{ display:'flex', gap:'8px'}}>
+                      <Button
+                        size="small"
+                        variant="text"
+                        color="primary"
+                        // onClick={}
+                        sx={{minWidth:'0', width:'32px'}}>
+                        <EditIcon></EditIcon>
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="text"
+                        color="primary"
+                        // onClick={}
+                        sx={{minWidth:'0', width:'32px'}}>
+                        <DeleteIcon></DeleteIcon>
+                      </Button>
+                    </Box>
+                  )}
+                  </Box>
+                  <Typography variant="body2" color="textSecondary" overflow='hidden' sx={{marginTop:'8px', textOverflow: 'ellipsis', whiteSpace:'normal'}}>
                     {post.content.slice(0, 90)}...
                   </Typography>
                 </CardContent>
@@ -160,7 +188,7 @@ return (
                   <Typography variant="subtitle2" color="textSecondary" overflow='hidden' sx={{ textAlign: 'left', alignContent:'flex-end',  whiteSpace: 'nowrap', textOverflow: 'ellipsis'}}>
                     Author: {post.author}
                   </Typography>
-                  <Button size="small" variant="contained" sx={{padding:'2px 0 0 0', "&:hover":{scale:1.05}, transition:'scale 0.15s linear'}} component={Link} to={`/posts/${post._id}`}>
+                  <Button size="small" variant="contained" sx={{padding:'0', width:'72px', "&:hover":{scale:1.05}, transition:'scale 0.15s linear'}} component={Link} to={`/posts/${post._id}`}>
                     Read
                   </Button>
                 </CardActions>

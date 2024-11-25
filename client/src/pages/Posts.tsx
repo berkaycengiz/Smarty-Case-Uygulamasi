@@ -43,7 +43,7 @@ const PostDetails: React.FC = () => {
         <Typography variant="h3" fontSize={40} gutterBottom align="center" fontWeight={600}>
           {post.title}
         </Typography>
-        <Card sx={{maxWidth:'800px', minWidth:{xs:'0', sm:'400px'}, display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:'180px', border:"2px solid rgba(155, 155, 155, 0.16)", backgroundColor:'rgba(155, 155, 155, 0.1)', borderRadius:'0'}}>
+        <Card sx={{maxWidth:'800px', width:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:'180px', border:"2px solid rgba(155, 155, 155, 0.16)", backgroundColor:'rgba(155, 155, 155, 0.1)', borderRadius:'0'}}>
           <CardContent sx={{padding:'24px'}}>
             <Typography variant="body1" color="textPrimary" overflow="hidden" sx={{textOverflow: 'ellipsis', whiteSpace:'normal'}}>
               {post.content}

@@ -47,6 +47,7 @@ const Navbar: React.FC = () => {
       console.log(response.data);
       setMenuOpen(false);
       setLoggedIn(false);
+      localStorage.clear();
       navigate('/', {
         state: { message: 'Logout successful!', severity: 'success' },
       });
