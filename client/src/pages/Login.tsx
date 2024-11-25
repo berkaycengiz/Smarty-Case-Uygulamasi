@@ -34,6 +34,10 @@ const LoginForm: React.FC = () => {
     }
   }, [location.state, navigate]);
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const isLoggedIn = () => {
     return document.cookie.split(';').some((item) => item.trim().startsWith('COOKIE-AUTH='));
   };
@@ -141,6 +145,11 @@ const LoginForm: React.FC = () => {
           </Box>
         </form>
         </Box>
+        <Snackbar open={open} autoHideDuration={2500} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+          <Alert onClose={handleClose} severity={severity} variant='filled'>
+            {message}
+          </Alert>
+        </Snackbar>
       </Container>
     <Footer/>
   </div>  

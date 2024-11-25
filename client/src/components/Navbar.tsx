@@ -6,7 +6,6 @@ import HomeIcon from '@mui/icons-material/Home';
 import axios from 'axios';
 
 const Navbar: React.FC = () => {
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -34,7 +33,7 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     setLoggedIn(isLoggedIn());
-  }, []);
+  }, [location, loggedIn]);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -46,7 +45,7 @@ const Navbar: React.FC = () => {
         withCredentials: true,
       });
       console.log(response.data);
-      setMenuOpen(!menuOpen);
+      setMenuOpen(false);
       setLoggedIn(false);
       navigate('/', {
         state: { message: 'Logout successful!', severity: 'success' },
@@ -61,7 +60,7 @@ const Navbar: React.FC = () => {
     <Box sx={{marginBottom:'96px', overflow: 'hidden'}}> 
       <AppBar position="fixed" color="primary" sx={{minHeight:'64px'}}>
         <Toolbar sx={{minHeight:'64px'}}>
-        <Button color="inherit" component={RouterLink} to="/" sx={{fontSize:'20px', "&:hover":{scale:1.07}, transition:'scale 0.15s linear'}}>
+        <Button color="inherit" onClick={() => window.location.href = '/'} sx={{fontSize:'20px', "&:hover":{scale:1.07}, transition:'scale 0.15s linear'}}>
         <HomeIcon sx={{fontSize:'32px'}}/>
         </Button>
           <Typography sx={{ flexGrow: 1 }}>
@@ -99,11 +98,12 @@ const Navbar: React.FC = () => {
         <Button onClick={toggleMenu} component={RouterLink} to="/login" variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0', display: loggedIn ? 'none' : 'inline-flex'}}>
           Login
         </Button>
-        <Button onClick={handleLogout} component={RouterLink} to="/" variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0', display: loggedIn ? 'inline-flex' : 'none' }}>
+        <Button onClick={handleLogout} variant="text" sx={{"&:hover":{color: '#FF5733'}, color:"rgba(5, 5, 5, 1)", fontSize:'16px', borderBottom:'2px solid rgba(10, 10, 10, 0.4)', minWidth:'90px', borderRadius:'0', display: loggedIn ? 'inline-flex' : 'none' }}>
           Logout
         </Button>
       </Box>
     </Box>
+
   );
 };
 

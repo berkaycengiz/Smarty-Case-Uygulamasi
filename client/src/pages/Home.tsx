@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Button, Card, CardContent, CardActions, useTheme, Snackbar, Alert, Paper, TextField } from '@mui/material';
+import { Container, Typography, Box, Button, Card, CardContent, CardActions, useTheme, Snackbar, Alert, TextField } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -61,6 +61,7 @@ const Home: React.FC = () => {
   }, []);
 
   const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     if (formData.title === '' || formData.content === '') {
       setError('Please make sure all fields are filled in correctly.');
     }
@@ -76,6 +77,8 @@ const Home: React.FC = () => {
       navigate('/', {
         state: {message: 'Published successfully!', severity: 'success'},
       });
+      const updatedPosts = await axios.get('http://localhost:8080/posts');
+      setPosts(updatedPosts.data);
     } 
     catch (err: any) {
       console.error('Error:', err.response || err.message);
@@ -166,7 +169,7 @@ return (
           ))}
         </Grid>
         <Snackbar open={open} autoHideDuration={2500} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
-          <Alert onClose={handleClose} severity={severity} variant="outlined">
+          <Alert onClose={handleClose} severity={severity} variant='filled'>
             {message}
           </Alert>
         </Snackbar>

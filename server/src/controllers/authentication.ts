@@ -1,5 +1,5 @@
 import express from "express";
-import { getUserByEmail, createUser, getUserBySessionToken } from "../db/users";
+import { getUserByEmail, createUser, getUserBySessionToken, getUserByUsername } from "../db/users";
 import { authentication, random } from "../helpers";
 
 export const login = async (req: express.Request, res: express.Response): Promise<any> => {
@@ -48,6 +48,12 @@ export const register = async (req: express.Request, res: express.Response): Pro
 
         if(existingUser){
             return res.status(400).json({ message: 'Email already in use' });
+        }
+
+        const existingUser2 = await getUserByUsername(username);
+
+        if(existingUser2){
+            return res.status(400).json({ message: 'Username already in use' });
         }
 
         const salt = random();
