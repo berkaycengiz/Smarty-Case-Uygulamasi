@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Button, Card, CardContent, CardActions, useTheme, Snackbar, Alert, TextField } from '@mui/material';
+import { Container, Typography, Box, Button, Card, CardContent, CardActions, useTheme, Snackbar, Alert, TextField, Dialog, DialogActions, DialogTitle, DialogContent } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -39,8 +39,11 @@ const Home: React.FC = () => {
   const [message, setMessage] = React.useState('');
   const [severity, setSeverity] = React.useState<'success' | 'error' | 'info' | 'warning'>('success');
 
-  const [editMode, setEditMode] = useState(false); // Düzenleme modunun açık/kapalı olduğunu tutar
-  const [editPostId, setEditPostId] = useState<string | null>(null); // Düzenlenen postun ID'sini tutar
+  const [editMode, setEditMode] = useState(false);
+  const [editPostId, setEditPostId] = useState<string | null>(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
   const isLoggedIn = () => {
     return document.cookie.split(';').some((item) => item.trim().startsWith('COOKIE-AUTH='));
@@ -106,6 +109,30 @@ const Home: React.FC = () => {
     }
   };
 
+  const openModal = (postID: string) => {
+    setSelectedPostId(postID);
+    setIsModalOpen(true);
+  };
+  
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedPostId(null);
+  };
+
+  const handleDelete = async () => {
+      try {
+        await axios.delete(`http://localhost:8080/posts/${selectedPostId}`, { withCredentials: true });
+        setPosts(posts.filter((post) => post._id !== selectedPostId));
+        setMessage('Post deleted successfully!');
+        setSeverity('success');
+        setOpen(true);
+      }
+      catch (error: any) {
+        setMessage('Failed to delete post.');
+        setSeverity('error');
+      };
+}
+
 return (
   <div>
     <Navbar/>
@@ -166,17 +193,31 @@ return (
                         variant="text"
                         color="primary"
                         // onClick={}
-                        sx={{minWidth:'0', width:'32px'}}>
+                        sx={{minWidth:'0', width:'32px', height:'32px'}}>
                         <EditIcon></EditIcon>
                       </Button>
                       <Button
                         size="small"
                         variant="text"
                         color="primary"
-                        // onClick={}
-                        sx={{minWidth:'0', width:'32px'}}>
+                        onClick={() => openModal(post._id)}
+                        sx={{minWidth:'0', width:'32px', height:'32px'}}>
                         <DeleteIcon></DeleteIcon>
                       </Button>
+                      <Dialog open={isModalOpen} onClick={() => closeModal()}>
+                      <DialogTitle>Confirm Delete</DialogTitle>
+                      <DialogContent>
+                        <Typography>Are you sure you want to delete this post?</Typography>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button  onClick={() => closeModal()}>
+                          Cancel
+                        </Button>
+                        <Button onClick={() => handleDelete()}>
+                          Delete
+                        </Button>
+                      </DialogActions>
+                      </Dialog>
                     </Box>
                   )}
                   </Box>
@@ -196,7 +237,7 @@ return (
             </Grid>
           ))}
         </Grid>
-        <Snackbar open={open} autoHideDuration={2500} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+          <Snackbar open={open} autoHideDuration={2500} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
           <Alert onClose={handleClose} severity={severity} variant='filled'>
             {message}
           </Alert>

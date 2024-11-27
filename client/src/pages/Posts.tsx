@@ -21,8 +21,7 @@ const PostDetails: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      axios
-        .get(`http://localhost:8080/posts/${id}`)
+      axios.get(`http://localhost:8080/posts/${id}`)
         .then((response) => {
           setPost(response.data);
         })
