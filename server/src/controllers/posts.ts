@@ -34,6 +34,14 @@ export const createNewPost = async (req: express.Request, res: express.Response)
             return res.sendStatus(400);
         }
 
+        if (title.length > 40) {
+            return res.status(400).json({ message: 'Title should not exceed 40 characters.' });
+        }
+
+        if (content.length > 1000) {
+            return res.status(400).json({ message: 'Content should not exceed 1000 characters.' });
+        }
+
         const author = currentUser.username;
 
         const post = await createPost({
@@ -60,6 +68,18 @@ export const updatePost = async (req: express.Request, res: express.Response): P
         }
 
         const post = await getPostById(id);
+
+        if (!post) {
+            return res.status(404).send({ message: 'Post not found' });
+        }
+
+        if (title.length > 40) {
+            return res.status(400).json({ message: 'Title should not exceed 40 characters.' });
+        }
+
+        if (content.length > 1000) {
+            return res.status(400).json({ message: 'Content should not exceed 1000 characters.' });
+        }
 
         post.title = title;
         post.content = content;

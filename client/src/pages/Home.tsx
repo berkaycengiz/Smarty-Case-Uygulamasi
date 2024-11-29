@@ -22,7 +22,6 @@ interface FormData {
 
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
-  
   const [formData, setFormData] = useState<FormData>({ title: '', content: '' });
 
   const [error, setError] = useState('');
@@ -40,7 +39,6 @@ const Home: React.FC = () => {
   const [severity, setSeverity] = React.useState<'success' | 'error' | 'info' | 'warning'>('success');
 
   const [editMode, setEditMode] = useState(false);
-  const [editPostId, setEditPostId] = useState<string | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -102,10 +100,16 @@ const Home: React.FC = () => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
     if ((name === 'title' && value.length == 0) || (name === 'content'  && value.length == 0)){
-        setError('Please make sure all fields are filled in correctly.');
+      setError('Please make sure all fields are filled in correctly.');
+    }
+    else if ((name === 'title' && value.length > 40)){
+      setError('Title should not exceed 40 characters.');
+    }
+    else if ((name === 'content'  && value.length > 1000)){
+      setError('Content should not exceed 1000 characters.');
     }
     else {
-        setError('');
+      setError('');
     }
   };
 
@@ -121,7 +125,9 @@ const Home: React.FC = () => {
 
   const handleDelete = async () => {
       try {
-        await axios.delete(`http://localhost:8080/posts/${selectedPostId}`, { withCredentials: true });
+        await axios.delete(`http://localhost:8080/posts/${selectedPostId}`, { 
+        withCredentials: true 
+        });
         setPosts(posts.filter((post) => post._id !== selectedPostId));
         setMessage('Post deleted successfully!');
         setSeverity('success');
@@ -131,7 +137,35 @@ const Home: React.FC = () => {
         setMessage('Failed to delete post.');
         setSeverity('error');
       };
-}
+  }
+
+  const handleEdit = (post: BlogPost) => {
+    setFormData({ title: post.title, content: post.content });
+    setSelectedPostId(post._id);
+    setEditMode(true);
+  };
+
+  const handleUpdate = async (event: React.FormEvent) => {
+    event.preventDefault();
+      try {
+        await axios.patch(`http://localhost:8080/posts/${selectedPostId}`, formData, { 
+        withCredentials: true 
+        });
+        const updatedPosts = await axios.get('http://localhost:8080/posts');
+        setPosts(updatedPosts.data);
+        setEditMode(false);
+        setFormData({ title: '', content: '' });
+        setMessage('Post updated successfully!');
+        setSeverity('success');
+        setOpen(true);
+      } 
+      catch (error: any) {
+        console.error('Error updating post:', error.response || error.message);
+        setMessage(error.response.data.message);
+        setSeverity('error');
+        setOpen(true);
+      }
+  };
 
 return (
   <div>
@@ -184,6 +218,41 @@ return (
             <Grid size={{ xs: 12, md: 4, sm: 6 }} key={post._id}>
               <Card sx={{display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:'180px', border:"2px solid rgba(155, 155, 155, 0.16)", backgroundColor:'rgba(155, 155, 155, 0.1)', borderRadius:'0'}}>
                 <CardContent sx={{padding:'12px'}}>
+                {editMode && selectedPostId === post._id ? (
+                   <form onSubmit={handleUpdate} style={{width:'100%'}}>
+                      <TextField
+                        fullWidth
+                        label="Title"
+                        variant="outlined"
+                        margin="normal"
+                        value={formData.title}
+                        onChange={handleChange}
+                        name="title"
+                        sx={{ marginBottom: '8px' }}
+                      />
+                      <TextField
+                        fullWidth
+                        label="Content"
+                        variant="outlined"
+                        margin="normal"
+                        value={formData.content}
+                        onChange={handleChange}
+                        name="content"
+                        multiline
+                        rows={4}
+                        sx={{ marginBottom: '8px' }}
+                      />
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Button type='submit' variant="outlined" color="primary">
+                          Update
+                        </Button>
+                        <Button onClick={() => setEditMode(false)} variant="outlined" color="secondary">
+                          Cancel
+                        </Button>
+                      </Box>
+                    </form>
+                  ) : (
+                    <>
                   <Box sx={{display:'flex', justifyContent:'space-between'}}>
                   <Typography component={Link} to={`/posts/${post._id}`} variant="h6" overflow='hidden' sx={{ color:'inherit', "&:hover":{color: '#FF5733'}, textDecoration:'none', whiteSpace: 'nowrap', textOverflow: 'ellipsis', transition:'color 0.15s linear'}}>{post.title}</Typography>
                   {post.author === username && (
@@ -192,7 +261,7 @@ return (
                         size="small"
                         variant="text"
                         color="primary"
-                        // onClick={}
+                        onClick={() => handleEdit(post)}
                         sx={{minWidth:'0', width:'32px', height:'32px'}}>
                         <EditIcon></EditIcon>
                       </Button>
@@ -204,26 +273,14 @@ return (
                         sx={{minWidth:'0', width:'32px', height:'32px'}}>
                         <DeleteIcon></DeleteIcon>
                       </Button>
-                      <Dialog open={isModalOpen} onClick={() => closeModal()}>
-                      <DialogTitle>Confirm Delete</DialogTitle>
-                      <DialogContent>
-                        <Typography>Are you sure you want to delete this post?</Typography>
-                      </DialogContent>
-                      <DialogActions>
-                        <Button  onClick={() => closeModal()}>
-                          Cancel
-                        </Button>
-                        <Button onClick={() => handleDelete()}>
-                          Delete
-                        </Button>
-                      </DialogActions>
-                      </Dialog>
                     </Box>
                   )}
                   </Box>
                   <Typography variant="body2" color="textSecondary" overflow='hidden' sx={{marginTop:'8px', textOverflow: 'ellipsis', whiteSpace:'normal'}}>
                     {post.content.slice(0, 90)}...
                   </Typography>
+                  </>
+                )}
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'space-between', padding:'12px' }}>
                   <Typography variant="subtitle2" color="textSecondary" overflow='hidden' sx={{ textAlign: 'left', alignContent:'flex-end',  whiteSpace: 'nowrap', textOverflow: 'ellipsis'}}>
@@ -241,7 +298,21 @@ return (
           <Alert onClose={handleClose} severity={severity} variant='filled'>
             {message}
           </Alert>
-        </Snackbar>
+          </Snackbar>
+          <Dialog open={isModalOpen} onClick={() => closeModal()}>
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Typography>Are you sure you want to delete this post?</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => closeModal()}>
+              Cancel
+            </Button>
+            <Button onClick={() => handleDelete()}>
+              Delete
+            </Button>
+          </DialogActions>
+          </Dialog>
       </Container>
     <Footer />
   </div>
